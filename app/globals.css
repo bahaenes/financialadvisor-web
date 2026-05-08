@@ -1,26 +1,271 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --background: #0a0e1a;
+  --foreground: #e2e8f0;
+  --card: #111827;
+  --card-foreground: #e2e8f0;
+  --popover: #1a2035;
+  --popover-foreground: #e2e8f0;
+  --primary: #00d4ff;
+  --primary-foreground: #0a0e1a;
+  --secondary: #1a2035;
+  --secondary-foreground: #e2e8f0;
+  --muted: #1e2a3a;
+  --muted-foreground: #94a3b8;
+  --accent: #00d4ff;
+  --accent-foreground: #0a0e1a;
+  --destructive: #ff4d6a;
+  --border: rgba(0, 212, 255, 0.12);
+  --input: #1a2035;
+  --ring: #00d4ff;
+  --radius: 0.75rem;
+  --positive: #00c896;
+  --negative: #ff4d6a;
+  --neutral: #fbbf24;
+  --sidebar: #0f1724;
+  --sidebar-foreground: #e2e8f0;
+  --sidebar-primary: #00d4ff;
+  --sidebar-primary-foreground: #0a0e1a;
+  --sidebar-accent: #1a2035;
+  --sidebar-accent-foreground: #e2e8f0;
+  --sidebar-border: rgba(0, 212, 255, 0.10);
+  --sidebar-ring: #00d4ff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-color: #0a0e1a;
+    color: #e2e8f0;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  html {
+    @apply font-sans;
+    color-scheme: dark;
+  }
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+  }
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0e1a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 255, 0.2);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 212, 255, 0.4);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* ── Glass card ───────────────────────────────────────────────────────────── */
+  .glass-card {
+    background: rgba(17, 24, 39, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 212, 255, 0.10);
+    border-radius: 1rem;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+  .glass-card-hover:hover {
+    background: rgba(26, 32, 53, 0.9);
+    border-color: rgba(0, 212, 255, 0.22);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  /* ── Metric card with gradient top accent ────────────────────────────────── */
+  .metric-card-gradient {
+    position: relative;
+    overflow: hidden;
+  }
+  .metric-card-gradient::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #00d4ff 0%, #8b5cf6 100%);
+    border-radius: 1rem 1rem 0 0;
+    opacity: 0.8;
+  }
+
+  /* ── Skeleton shimmer ────────────────────────────────────────────────────── */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(30, 40, 60, 0.6) 25%,
+      rgba(40, 55, 80, 0.7) 50%,
+      rgba(30, 40, 60, 0.6) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  /* ── Signal chips ────────────────────────────────────────────────────────── */
+  .text-positive { color: #00c896; }
+  .text-negative { color: #ff4d6a; }
+  .text-accent-cyan { color: #00d4ff; }
+  .border-accent-cyan { border-color: rgba(0, 212, 255, 0.2); }
+
+  .bg-positive { background-color: rgba(0, 200, 150, 0.12); }
+  .bg-negative { background-color: rgba(255, 77, 106, 0.12); }
+  .bg-neutral-signal { background-color: rgba(251, 191, 36, 0.12); }
+
+  .signal-al {
+    background: linear-gradient(135deg, rgba(0, 200, 150, 0.2), rgba(0, 200, 150, 0.10));
+    color: #00c896;
+    border: 1px solid rgba(0, 200, 150, 0.35);
+    box-shadow: 0 0 10px rgba(0, 200, 150, 0.12);
+  }
+  .signal-sat {
+    background: linear-gradient(135deg, rgba(255, 77, 106, 0.2), rgba(255, 77, 106, 0.10));
+    color: #ff4d6a;
+    border: 1px solid rgba(255, 77, 106, 0.35);
+    box-shadow: 0 0 10px rgba(255, 77, 106, 0.12);
+  }
+  .signal-tut {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.10));
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.35);
+  }
+
+  /* ── Ticker bar ──────────────────────────────────────────────────────────── */
+  .ticker-bar {
+    background: rgba(0, 212, 255, 0.03);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.10);
+  }
+
+  /* ── Market status dots ──────────────────────────────────────────────────── */
+  .market-open {
+    background: #00c896;
+    box-shadow: 0 0 8px rgba(0, 200, 150, 0.7);
+  }
+  .market-closed {
+    background: #ff4d6a;
+    box-shadow: 0 0 8px rgba(255, 77, 106, 0.7);
+  }
+
+  /* ── Sidebar ─────────────────────────────────────────────────────────────── */
+  .sidebar-nav {
+    background: #0d1420;
+    border-right: 1px solid rgba(0, 212, 255, 0.08);
+  }
+
+  /* ── Input dark ──────────────────────────────────────────────────────────── */
+  .input-dark {
+    background: #0d1420;
+    border: 1px solid rgba(0, 212, 255, 0.15);
+    color: #e2e8f0;
+  }
+  .input-dark:focus {
+    border-color: rgba(0, 212, 255, 0.5);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.08);
+  }
+
+  /* ── Gradient overlays ───────────────────────────────────────────────────── */
+  .gradient-positive {
+    background: linear-gradient(135deg, rgba(0, 200, 150, 0.12) 0%, transparent 100%);
+  }
+  .gradient-negative {
+    background: linear-gradient(135deg, rgba(255, 77, 106, 0.12) 0%, transparent 100%);
+  }
+  .gradient-brand {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.12), rgba(139, 92, 246, 0.08));
+  }
+}
+
+/* ── Animations ───────────────────────────────────────────────────────────── */
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-ticker {
+  animation: ticker-scroll 40s linear infinite;
+}
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease forwards;
 }
