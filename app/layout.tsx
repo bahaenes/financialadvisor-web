@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Hanken_Grotesk, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const hanken = Hanken_Grotesk({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-hanken" });
+const ibmPlex = IBM_Plex_Sans({ subsets: ["latin"], weight: ["600"], variable: "--font-ibm-plex" });
 
 export const metadata: Metadata = {
   title: "BIST Financial Advisor",
@@ -16,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr" className={`${inter.variable} h-full`}>
+    <html lang="tr" className={`${inter.variable} ${hanken.variable} ${ibmPlex.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased" style={{ backgroundColor: "#0a0e1a" }}>{children}</body>
     </html>
   );

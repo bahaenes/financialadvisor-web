@@ -1,11 +1,12 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useMacroData } from "@/lib/api"
 import { useAppStore } from "@/store/appStore"
 import { useT } from "@/lib/i18n"
 import { getIstanbulTime, isMarketOpen, formatPct } from "@/lib/utils"
-import { BarChart3, Clock, TrendingUp, TrendingDown } from "lucide-react"
+import { BarChart3, Clock, TrendingUp, TrendingDown, LayoutGrid } from "lucide-react"
 import { LanguageMarketBar } from "@/components/layout/LanguageMarketBar"
 
 function getMarketTime(market: string): string {
@@ -109,6 +110,11 @@ export function Header() {
           <Clock className="h-3.5 w-3.5" />
           <span className="text-xs font-mono">{time}</span>
         </div>
+
+        {/* Design screens link */}
+        <Link href="/screens" className="hidden sm:flex items-center gap-1.5 text-slate-500 hover:text-cyan-400 transition-colors" title="UI Screens">
+          <LayoutGrid className="h-4 w-4" />
+        </Link>
       </div>
     </header>
   )

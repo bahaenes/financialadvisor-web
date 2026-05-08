@@ -33,12 +33,12 @@ export function OverviewPanel({ stock, technical }: OverviewPanelProps) {
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <h2 className="text-2xl font-bold text-white">{stock.symbol.replace(".IS", "")}</h2>
+              <h2 className="font-hanken text-display-xl text-white">{stock.symbol.replace(".IS", "")}</h2>
               {signals && <SignalBadge signal={signals.overall} score={signals.score} size="md" />}
             </div>
             <p className="text-sm text-slate-400 mb-4">{stock.name}</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold font-mono text-slate-100">
+              <span className="text-4xl font-bold font-mono text-slate-100 text-data-tabular">
                 {formatPrice(stock.price)}
               </span>
               <span className="text-lg text-slate-400">{currencySymbol}</span>

@@ -6,6 +6,29 @@ import { formatPrice } from "@/lib/utils"
 import { TrendingUp, TrendingDown, Minus, Brain, AlertTriangle } from "lucide-react"
 import type { PredictionData } from "@/lib/types"
 
+function ConfidenceGauge({ level }: { level: "high" | "medium" | "low" }) {
+  const pct = level === "high" ? 87 : level === "medium" ? 62 : 38
+  const angle = -180 + (pct / 100) * 180
+  const rad = (angle * Math.PI) / 180
+  const cx = 80; const cy = 80; const r = 60
+  const nx = cx + r * Math.cos(rad)
+  const ny = cy + r * Math.sin(rad)
+  const color = level === "high" ? "#00c896" : level === "medium" ? "#fbbf24" : "#ff4d6a"
+
+  return (
+    <div className="flex flex-col items-center">
+      <svg viewBox="0 0 160 90" className="w-full max-w-[160px]">
+        <path d={`M 20 80 A 60 60 0 0 1 140 80`} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="14" strokeLinecap="round" />
+        <path d={`M 20 80 A 60 60 0 0 1 ${nx.toFixed(1)} ${ny.toFixed(1)}`} fill="none" stroke={color} strokeWidth="14" strokeLinecap="round"
+          style={{ filter: `drop-shadow(0 0 6px ${color}66)` }} />
+        <circle cx={nx.toFixed(1)} cy={ny.toFixed(1)} r="5" fill={color} />
+        <text x="80" y="68" textAnchor="middle" fontSize="22" fontWeight="700" fill={color} fontFamily="var(--font-hanken)">{pct}%</text>
+        <text x="80" y="80" textAnchor="middle" fontSize="8" fill="rgba(148,163,184,0.8)" letterSpacing="0.1em">CONFIDENCE</text>
+      </svg>
+    </div>
+  )
+}
+
 function ForecastChart({ history, median, low, high }: {
   history: number[]
   median: number[]
@@ -47,18 +70,12 @@ function ForecastChart({ history, median, low, high }: {
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 160 }}>
-      {/* confidence band */}
       <path d={bandPath} fill={bandFill} />
-      {/* historical */}
       <path d={histPath} fill="none" stroke="rgba(148,163,184,0.45)" strokeWidth="1.5" strokeLinejoin="round" />
-      {/* separator */}
       <line x1={sepX} y1={0} x2={sepX} y2={H} stroke="rgba(0,212,255,0.25)" strokeWidth="1" strokeDasharray="3 3" />
-      {/* predicted median */}
       <path d={medPath} fill="none" stroke={color} strokeWidth="2" strokeDasharray="5 3" strokeLinejoin="round" />
-      {/* dots */}
       <circle cx={sepX} cy={sepY} r={3.5} fill="#00d4ff" />
       <circle cx={endX} cy={endY} r={4} fill={color} />
-      {/* end price label */}
       <rect x={endX - 2} y={endY - 16} width={44} height={14} rx={3} fill="rgba(15,23,36,0.85)" />
       <text x={endX + 20} y={endY - 5} textAnchor="middle" fontSize={9} fill={color} fontFamily="monospace">
         {median[predLen - 1] > 1000
@@ -91,15 +108,12 @@ function SignalCard({ data }: { data: PredictionData }) {
     <div className={`rounded-2xl border p-4 ${cfg.bg} ${cfg.border}`}>
       <div className="flex items-center gap-2 mb-3">
         <Icon className={`h-5 w-5 ${cfg.color}`} />
-        <span className={`text-lg font-bold ${cfg.color}`}>{cfg.label}</span>
+        <span className={`text-lg font-bold font-hanken ${cfg.color}`}>{cfg.label}</span>
       </div>
-
       <p className={`text-3xl font-mono font-bold ${cfg.color} mb-3`}>
         {data.predicted_return_pct > 0 ? "+" : ""}{data.predicted_return_pct.toFixed(2)}%
       </p>
-
       <p className={`text-xs ${cfg.color} opacity-70`}>{t.prediction7d}</p>
-
       <div className="mt-4 space-y-2 border-t border-white/5 pt-3">
         <div className="flex justify-between text-xs">
           <span className="text-slate-500">{t.currentPrice}</span>
@@ -140,28 +154,72 @@ export function PredictionPanel({ symbol }: { symbol: string }) {
     )
   }
 
+  const isUp = data.signal === "STRONG_BUY" || data.signal === "BUY"
+  const lastHistory = data.history[data.history.length - 1]
+  const lastLow = data.predicted_low[data.predicted_low.length - 1]
+  const lastHigh = data.predicted_high[data.predicted_high.length - 1]
+
   return (
-    <div className="space-y-4">
-      {/* Header row */}
-      <div className="glass-card p-4">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">{t.aiPrediction}</p>
-          <span className={`flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-full border font-medium ${
-            data.model_used === "Chronos"
-              ? "bg-violet-500/15 text-violet-300 border-violet-500/30"
-              : "bg-slate-700/40 text-slate-400 border-slate-600/30"
-          }`}>
-            <Brain className="h-2.5 w-2.5" />
-            {data.model_used === "Chronos" ? "Amazon Chronos" : "Statistical Model"}
-          </span>
+    <div className="space-y-4 animate-fade-in">
+      {/* ── Bento grid: main gauge + confidence ─────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Main prediction card — AI gradient border */}
+        <div className={`md:col-span-2 glass-card p-5 ${isUp ? "ai-border-positive" : "ai-border"} layer-1`}>
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Brain className="h-4 w-4 text-cyan-400" />
+                <h3 className="font-hanken text-headline-md text-white">{t.aiPrediction}</h3>
+              </div>
+              <p className="text-xs text-slate-500">{t.prediction7d}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border font-ibm-plex text-label-sm ${
+                data.model_used === "Chronos"
+                  ? "bg-violet-500/15 text-violet-300 border-violet-500/30"
+                  : "bg-slate-700/40 text-slate-400 border-slate-600/30"
+              }`}>
+                <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                {data.model_used === "Chronos" ? "Chronos" : "Statistical"}
+              </span>
+            </div>
+          </div>
+
+          <SignalCard data={data} />
+
+          {/* Price bounds */}
+          <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-cyan-900/20">
+            <div>
+              <span className="block text-xs text-slate-500 mb-1 font-ibm-plex text-label-sm">Lower (95%)</span>
+              <span className="block text-data-tabular text-rose-400 font-mono">{formatPrice(lastLow)}</span>
+            </div>
+            <div className="text-center">
+              <span className="block text-xs text-slate-500 mb-1 font-ibm-plex text-label-sm">Current</span>
+              <span className="block text-data-tabular text-slate-200 font-mono">{formatPrice(lastHistory)}</span>
+            </div>
+            <div className="text-right">
+              <span className="block text-xs text-slate-500 mb-1 font-ibm-plex text-label-sm">Upper (95%)</span>
+              <span className="block text-data-tabular text-emerald-400 font-mono">{formatPrice(lastHigh)}</span>
+            </div>
+          </div>
         </div>
 
-        <SignalCard data={data} />
+        {/* Confidence gauge card */}
+        <div className="glass-card p-5 flex flex-col items-center justify-center layer-1">
+          <p className="text-xs text-slate-500 font-ibm-plex text-label-sm mb-3">Model Confidence</p>
+          <ConfidenceGauge level={data.confidence} />
+          <div className="mt-3 text-center space-y-1">
+            <p className="text-xs text-slate-500">Model</p>
+            <p className="text-sm font-medium text-slate-300">
+              {data.model_used === "Chronos" ? "Amazon Chronos" : "Statistical"}
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Forecast chart */}
-      <div className="glass-card p-4">
-        <p className="text-xs text-slate-500 uppercase tracking-wider font-medium mb-3">{t.forecastChart}</p>
+      {/* ── Forecast chart ───────────────────────────────────────────────────── */}
+      <div className="glass-card p-5 layer-1">
+        <p className="text-xs text-slate-500 font-ibm-plex text-label-sm uppercase mb-3">{t.forecastChart}</p>
         <ForecastChart
           history={data.history}
           median={data.predicted_prices}

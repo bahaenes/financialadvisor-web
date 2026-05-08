@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Historical Analysis - AAPL</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-error": "#690005",
+                "primary-container": "#00d4ff",
+                "surface-dim": "#0e1417",
+                "tertiary-fixed": "#ffdeae",
+                "on-tertiary-fixed": "#281900",
+                "on-background": "#dde3e7",
+                "on-primary": "#003642",
+                "on-secondary-fixed-variant": "#3c475a",
+                "on-primary-container": "#00586b",
+                "tertiary": "#ffd9a1",
+                "surface-container-highest": "#2f3639",
+                "primary-fixed-dim": "#3cd7ff",
+                "primary": "#a8e8ff",
+                "on-tertiary-container": "#6c4900",
+                "inverse-on-surface": "#2b3134",
+                "surface-tint": "#3cd7ff",
+                "on-tertiary-fixed-variant": "#604100",
+                "tertiary-container": "#feb528",
+                "secondary-fixed": "#d8e3fb",
+                "background": "#0e1417",
+                "surface-bright": "#333a3d",
+                "on-secondary-fixed": "#111c2d",
+                "tertiary-fixed-dim": "#ffba3d",
+                "surface-container-lowest": "#080f12",
+                "on-secondary": "#263143",
+                "outline-variant": "#3c494e",
+                "on-tertiary": "#432c00",
+                "on-secondary-container": "#aeb9d0",
+                "on-primary-fixed": "#001f27",
+                "inverse-primary": "#00677e",
+                "error": "#ffb4ab",
+                "surface-container-high": "#242b2e",
+                "inverse-surface": "#dde3e7",
+                "on-primary-fixed-variant": "#004e5f",
+                "secondary-container": "#3e495d",
+                "surface-container-low": "#161d1f",
+                "surface-container": "#1a2123",
+                "surface-variant": "#2f3639",
+                "error-container": "#93000a",
+                "secondary": "#bcc7de",
+                "outline": "#859398",
+                "on-error-container": "#ffdad6",
+                "primary-fixed": "#b4ebff",
+                "on-surface": "#dde3e7",
+                "on-surface-variant": "#bbc9cf",
+                "secondary-fixed-dim": "#bcc7de",
+                "surface": "#0e1417"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "container-padding": "12px",
+                "element-gap": "8px",
+                "grid-gutter": "1px",
+                "unit": "4px"
+        },
+        "fontFamily": {
+                "headline-md": [
+                        "Hanken Grotesk"
+                ],
+                "label-md": [
+                        "Hanken Grotesk"
+                ],
+                "data-mono": [
+                        "Hanken Grotesk"
+                ],
+                "body-sm": [
+                        "Hanken Grotesk"
+                ],
+                "headline-lg": [
+                        "Hanken Grotesk"
+                ],
+                "body-md": [
+                        "Hanken Grotesk"
+                ]
+        },
+        "fontSize": {
+                "headline-md": [
+                        "18px",
+                        {
+                                "lineHeight": "24px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-md": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "data-mono": [
+                        "13px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "body-sm": [
+                        "13px",
+                        {
+                                "lineHeight": "18px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .layer-1 { box-shadow: 0 4px 4px rgba(0, 0, 0, 0.04); }
+        .layer-2 { box-shadow: 0 12px 12px rgba(0, 0, 0, 0.08); }
+        .layer-3 { box-shadow: 0 24px 24px rgba(0, 0, 0, 0.12); }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-20 md:pb-0">
+<!-- TopNavBar -->
+<header class="bg-surface text-primary font-headline-md text-headline-md font-body-md text-body-md fixed top-0 w-full z-50 border-b border-outline-variant shadow-sm flex justify-between items-center px-container-padding max-w-[1440px] mx-auto h-16 hidden md:flex">
+<div class="flex items-center gap-container-padding">
+<span class="text-headline-lg font-headline-lg font-bold text-primary">Strategeia Terminal</span>
+<nav class="flex items-center gap-element-gap">
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200 active:opacity-80 px-2" href="#">Dashboard</a>
+<a class="text-secondary border-b-2 border-secondary pb-1 hover:text-secondary transition-colors duration-200 active:opacity-80 px-2" href="#">Markets</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200 active:opacity-80 px-2" href="#">Portfolio</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors duration-200 active:opacity-80 px-2" href="#">Analysis</a>
+</nav>
+</div>
+<div class="flex items-center gap-element-gap">
+<div class="relative">
+<input class="bg-surface-container-low border border-outline-variant rounded px-2 py-1 text-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Search..." type="text"/>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px]">search</span>
+</div>
+<button class="text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">settings</span></button>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A professional headshot of a person, framed closely to show head and shoulders. The image is clean and well-lit, suitable for a corporate SaaS platform profile picture. The background is neutral, ensuring the subject stands out clearly. Lighting is soft and even, highlighting the subject's features without harsh shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-OclQr-ipsEoYqbGxu8mCIFUVT-G64cszXZuM4HcIvINX_d1P40vAlBPWkJcDtFiZcbCpFUS4MAM4__Wkv_PVQta1qjsNyvpVuZxmcTziqk1pPaPghPY16gy0XwW3ptpNpznNj7X9d2rJIldGEHK4QngkrXg6XS84US8g6h9sGkrHKP7-f-HfVDjFwSoWW4SJn4NKAAwty_vvMk4YKAtL4x_-xIUxizdNcpVMa4lV6tZEbraA-8kzakLcRntpUPkbMRi4NQzBdJI"/>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="bg-surface-container-low text-on-surface font-label-md text-label-md font-body-md text-body-md fixed left-0 top-16 h-full w-64 border-r border-outline-variant flex flex-col p-container-padding space-y-element-gap hidden lg:flex z-40">
+<div class="mb-container-padding px-2">
+<div class="flex items-center gap-element-gap mb-1">
+<span class="material-symbols-outlined text-[24px] text-primary">analytics</span>
+<span class="font-headline-md text-headline-md text-primary">Alpha Terminal</span>
+</div>
+<span class="text-on-surface-variant font-label-md text-label-md">Pro Account</span>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-element-gap px-2 py-1 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg scale-95 hover:scale-100" href="#">
+<span class="material-symbols-outlined">list_alt</span> Watchlist
+            </a>
+<a class="flex items-center gap-element-gap px-2 py-1 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg scale-95 hover:scale-100" href="#">
+<span class="material-symbols-outlined">show_chart</span> Indices
+            </a>
+<a class="flex items-center gap-element-gap px-2 py-1 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg scale-95 hover:scale-100" href="#">
+<span class="material-symbols-outlined">psychology</span> AI Insights
+            </a>
+<a class="flex items-center gap-element-gap px-2 py-1 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg scale-95 hover:scale-100" href="#">
+<span class="material-symbols-outlined">newspaper</span> News Feed
+            </a>
+<a class="flex items-center gap-element-gap px-2 py-1 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg scale-95 hover:scale-100" href="#">
+<span class="material-symbols-outlined">swap_vert</span> Orders
+            </a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-0 lg:ml-64 pt-16 p-container-padding max-w-[1440px] mx-auto">
+<!-- Header Section -->
+<div class="mb-container-padding flex flex-col md:flex-row justify-between items-start md:items-center gap-element-gap">
+<div>
+<div class="flex items-center gap-element-gap mb-1">
+<h1 class="font-headline-lg text-headline-lg text-primary">AAPL</h1>
+<span class="bg-surface-container-high text-on-surface-variant font-label-md text-label-md px-1 py-[2px] rounded border border-outline-variant">NASDAQ</span>
+</div>
+<p class="font-headline-md text-headline-md text-on-surface-variant">Apple Inc.</p>
+</div>
+<div class="flex flex-col items-end">
+<div class="flex items-center gap-element-gap">
+<span class="font-headline-lg text-headline-lg text-primary">$189.84</span>
+<span class="bg-primary/10 text-primary font-data-mono text-data-mono px-2 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span> +2.34 (1.25%)
+                    </span>
+</div>
+<span class="text-on-surface-variant font-label-md text-label-md">As of close: Oct 24, 4:00 PM EDT</span>
+</div>
+</div>
+<!-- Toolbar -->
+<div class="bg-surface border border-outline-variant rounded-lg p-2 flex flex-wrap gap-element-gap mb-container-padding layer-1 items-center justify-between">
+<div class="flex gap-2">
+<button class="px-2 py-1 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high rounded transition-colors">1D</button>
+<button class="px-2 py-1 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high rounded transition-colors">1W</button>
+<button class="px-2 py-1 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high rounded transition-colors">1M</button>
+<button class="px-2 py-1 font-label-md text-label-md bg-secondary-container text-on-secondary-container rounded font-bold">3M</button>
+<button class="px-2 py-1 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high rounded transition-colors">1Y</button>
+<button class="px-2 py-1 font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high rounded transition-colors">5Y</button>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center gap-1 px-2 py-1 font-label-md text-label-md text-primary border border-outline-variant rounded hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[16px]">candlestick_chart</span> Chart Type
+                </button>
+<button class="flex items-center gap-1 px-2 py-1 font-label-md text-label-md text-primary border border-outline-variant rounded hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span> Indicators
+                </button>
+</div>
+</div>
+<!-- Main Chart Area (Bento Layout) -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-container-padding mb-container-padding">
+<!-- Large Chart Container -->
+<div class="lg:col-span-2 bg-surface border border-outline-variant border-t-2 border-t-primary rounded-lg layer-1 flex flex-col relative overflow-hidden h-[500px]">
+<div class="absolute inset-0 bg-gradient-to-b from-transparent to-surface-container-lowest pointer-events-none opacity-50 z-0"></div>
+<div class="p-container-padding border-b border-outline-variant flex justify-between items-center z-10 relative bg-surface/80 backdrop-blur-sm">
+<h2 class="font-headline-md text-headline-md text-primary">Price &amp; Volume</h2>
+<div class="flex gap-2">
+<span class="flex items-center gap-1 font-label-md text-label-md text-on-surface-variant"><span class="w-2 h-2 rounded-full bg-secondary"></span> MA(50)</span>
+<span class="flex items-center gap-1 font-label-md text-label-md text-on-surface-variant"><span class="w-2 h-2 rounded-full bg-tertiary"></span> MA(200)</span>
+</div>
+</div>
+<!-- Mock Chart Area -->
+<div class="flex-grow p-container-padding relative z-10 flex flex-col justify-end">
+<!-- Grid Lines -->
+<div class="absolute inset-x-container-padding top-container-padding bottom-[100px] flex flex-col justify-between z-0">
+<div class="border-t border-outline-variant/30 w-full"></div>
+<div class="border-t border-outline-variant/30 w-full"></div>
+<div class="border-t border-outline-variant/30 w-full"></div>
+<div class="border-t border-outline-variant/30 w-full"></div>
+<div class="border-t border-outline-variant/30 w-full"></div>
+</div>
+<!-- Candlesticks (Mock) -->
+<div class="relative h-full z-10 flex items-end gap-1 mb-8 pb-4 border-b border-outline-variant/30 px-2">
+<div class="w-2 bg-primary h-[40%] mb-[10%] mx-auto relative"><div class="absolute top-[-10px] bottom-[-20px] w-[1px] bg-primary left-1/2 -translate-x-1/2"></div></div>
+<div class="w-2 bg-error h-[30%] mb-[50%] mx-auto relative"><div class="absolute top-[-5px] bottom-[-15px] w-[1px] bg-error left-1/2 -translate-x-1/2"></div></div>
+<div class="w-2 bg-primary h-[50%] mb-[20%] mx-auto relative"><div class="absolute top-[-15px] bottom-[-10px] w-[1px] bg-primary left-1/2 -translate-x-1/2"></div></div>
+<div class="w-2 bg-primary h-[20%] mb-[70%] mx-auto relative"><div class="absolute top-[-10px] bottom-[-5px] w-[1px] bg-primary left-1/2 -translate-x-1/2"></div></div>
+<div class="w-2 bg-error h-[60%] mb-[10%] mx-auto relative"><div class="absolute top-[-20px] bottom-[-20px] w-[1px] bg-error left-1/2 -translate-x-1/2"></div></div>
+<div class="w-2 bg-primary h-[40%] mb-[10%] mx-auto relative"><div class="absolute top-[-10px] bottom-[-20px] w-[1px] bg-primary left-1/2 -translate-x-1/2"></div></div>
+<div class="w-2 bg-error h-[30%] mb-[50%] mx-auto relative"><div class="absolute top-[-5px] bottom-[-15px] w-[1px] bg-error left-1/2 -translate-x-1/2"></div></div>
+<div class="w-2 bg-primary h-[50%] mb-[20%] mx-auto relative"><div class="absolute top-[-15px] bottom-[-10px] w-[1px] bg-primary left-1/2 -translate-x-1/2"></div></div>
+<!-- ... repeated for effect ... -->
+<div class="w-2 bg-primary h-[45%] mb-[25%] mx-auto relative"><div class="absolute top-[-10px] bottom-[-20px] w-[1px] bg-primary left-1/2 -translate-x-1/2"></div></div>
+<div class="w-2 bg-error h-[35%] mb-[45%] mx-auto relative"><div class="absolute top-[-5px] bottom-[-15px] w-[1px] bg-error left-1/2 -translate-x-1/2"></div></div>
+<div class="w-2 bg-primary h-[55%] mb-[15%] mx-auto relative"><div class="absolute top-[-15px] bottom-[-10px] w-[1px] bg-primary left-1/2 -translate-x-1/2"></div></div>
+<div class="w-2 bg-primary h-[25%] mb-[65%] mx-auto relative"><div class="absolute top-[-10px] bottom-[-5px] w-[1px] bg-primary left-1/2 -translate-x-1/2"></div></div>
+<div class="w-2 bg-error h-[65%] mb-[5%] mx-auto relative"><div class="absolute top-[-20px] bottom-[-20px] w-[1px] bg-error left-1/2 -translate-x-1/2"></div></div>
+</div>
+<!-- Volume Bar (Mock) -->
+<div class="absolute bottom-4 left-4 right-4 h-[60px] flex items-end gap-1 px-2 z-0 opacity-40">
+<div class="w-2 bg-on-surface-variant h-[40%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[20%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[60%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[30%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[80%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[40%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[20%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[60%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[40%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[20%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[60%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[30%] mx-auto"></div>
+<div class="w-2 bg-on-surface-variant h-[80%] mx-auto"></div>
+</div>
+</div>
+</div>
+<!-- Technical Indicators Stack -->
+<div class="flex flex-col gap-container-padding">
+<!-- RSI Container -->
+<div class="bg-surface border border-outline-variant rounded-lg layer-1 flex flex-col h-[238px]">
+<div class="p-2 border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-label-md text-label-md text-primary">RSI (14)</h3>
+<span class="font-data-mono text-data-mono text-on-surface-variant">54.21</span>
+</div>
+<div class="flex-grow p-2 relative flex items-center">
+<div class="absolute inset-x-2 top-[20%] border-t border-dashed border-outline-variant/50 w-full"></div>
+<div class="absolute inset-x-2 bottom-[20%] border-t border-dashed border-outline-variant/50 w-full"></div>
+<!-- Mock Line -->
+<div class="w-full h-[60%] border-b-2 border-primary relative overflow-hidden rounded-bl-[100%] rounded-tr-[50%] opacity-80"></div>
+</div>
+</div>
+<!-- MACD Container -->
+<div class="bg-surface border border-outline-variant rounded-lg layer-1 flex flex-col h-[238px]">
+<div class="p-2 border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-label-md text-label-md text-primary">MACD (12, 26, 9)</h3>
+<div class="flex gap-1">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="w-2 h-2 rounded-full bg-error"></span>
+</div>
+</div>
+<div class="flex-grow p-2 relative flex items-center justify-center">
+<div class="absolute inset-x-2 top-1/2 border-t border-outline-variant/50 w-full"></div>
+<!-- Mock Histogram & Lines -->
+<div class="flex items-end gap-1 h-full z-0 opacity-40 absolute bottom-1/2 w-full px-2">
+<div class="w-1 bg-primary h-[20%]"></div>
+<div class="w-1 bg-primary h-[40%]"></div>
+<div class="w-1 bg-primary h-[10%]"></div>
+<div class="w-1 bg-error h-[15%] transform translate-y-full"></div>
+<div class="w-1 bg-error h-[30%] transform translate-y-full"></div>
+</div>
+<div class="w-full h-[40%] border-b-2 border-primary relative z-10 rounded-t-full opacity-80"></div>
+<div class="w-full h-[30%] border-b-2 border-error absolute z-10 rounded-b-full opacity-80"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Data Grid Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-container-padding mb-container-padding">
+<!-- Statistics -->
+<div class="bg-surface border border-outline-variant rounded-lg layer-1">
+<div class="p-container-padding border-b border-outline-variant">
+<h2 class="font-headline-md text-headline-md text-primary">Key Statistics</h2>
+</div>
+<div class="p-container-padding grid grid-cols-2 gap-x-8 gap-y-4">
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant">Market Cap</span>
+<span class="font-data-mono text-data-mono text-primary">2.95T</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant">P/E Ratio (TTM)</span>
+<span class="font-data-mono text-data-mono text-primary">31.24</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant">52 Week High</span>
+<span class="font-data-mono text-data-mono text-primary">199.62</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant">52 Week Low</span>
+<span class="font-data-mono text-data-mono text-primary">164.08</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant">Dividend Yield</span>
+<span class="font-data-mono text-data-mono text-primary">0.53%</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant">Beta (5Y Monthly)</span>
+<span class="font-data-mono text-data-mono text-primary">1.28</span>
+</div>
+</div>
+</div>
+<!-- Profile & AI Insights -->
+<div class="bg-surface border border-outline-variant rounded-lg layer-1 flex flex-col">
+<div class="p-container-padding border-b border-outline-variant">
+<h2 class="font-headline-md text-headline-md text-primary">Company Profile</h2>
+</div>
+<div class="p-container-padding flex-grow flex flex-col gap-container-padding">
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3">
+                        Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. It also sells various related services. In addition, the company offers iPhone, a line of smartphones; Mac, a line of personal computers; iPad, a line of multi-purpose tablets...
+                    </p>
+<a class="font-label-md text-label-md text-primary hover:underline" href="#">Read Full Profile</a>
+<!-- AI Insight Box -->
+<div class="mt-auto border border-primary/30 bg-primary/5 p-2 rounded flex gap-2 items-start relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+<span class="material-symbols-outlined text-primary z-10">psychology</span>
+<div class="flex flex-col gap-1 z-10">
+<span class="font-label-md text-label-md text-primary">AI Sentiment Analysis</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Recent earnings reports suggest strong tailwinds in services revenue, though hardware cyclicality remains a minor concern. Overall sentiment is <strong class="text-primary">Bullish</strong>.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="bg-surface-container-highest text-primary font-label-md text-label-md fixed bottom-0 w-full z-50 md:hidden border-t border-outline-variant shadow-lg flex justify-around items-center py-2 px-container-padding transition-all duration-150">
+<a class="flex flex-col items-center justify-center text-primary font-bold active:bg-surface-variant p-2 rounded" href="#">
+<span class="material-symbols-outlined mb-1">trending_up</span>
+            Markets
+        </a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2 rounded" href="#">
+<span class="material-symbols-outlined mb-1">account_balance_wallet</span>
+            Trade
+        </a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2 rounded" href="#">
+<span class="material-symbols-outlined mb-1">lightbulb</span>
+            Insights
+        </a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2 rounded" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+            Profile
+        </a>
+</nav>
+</body></html>
