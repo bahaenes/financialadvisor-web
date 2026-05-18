@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Hanken_Grotesk, IBM_Plex_Sans } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -19,7 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr" className={`${inter.variable} ${hanken.variable} ${ibmPlex.variable} h-full`}>
-      <body className="min-h-full flex flex-col antialiased" style={{ backgroundColor: "#0a0e1a" }}>{children}</body>
+      <body className="min-h-full flex flex-col antialiased" style={{ backgroundColor: "#0a0e1a" }}>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
