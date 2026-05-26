@@ -119,6 +119,81 @@ async function parseRSS(name: string, url: string) {
   }
 }
 
+// ─── Finnhub market news ──────────────────────────────────────────────────────
+type FinnhubNewsItem = {
+  headline: string
+  summary: string
+  url: string
+  source: string
+  datetime: number
+  image?: string
+  related?: string
+}
+
+async function fetchFinnhubNews(apiKey: string): Promise<{ title: string; link: string; description: string; pubDate: string; name: string }[]> {
+  const res = await fetch(
+    `https://finnhub.io/api/v1/news?category=general&token=${apiKey}`,
+    { next: { revalidate: 600 } }
+  )
+  if (!res.ok) throw new Error(`Finnhub news error ${res.status}`)
+  const items: FinnhubNewsItem[] = await res.json()
+  return items.slice(0, 30).map((item) => ({
+    title: item.headline || "",
+    link: item.url || "",
+    description: item.summary || "",
+    pubDate: new Date(item.datetime * 1000).toISOString(),
+    name: item.source || "Finnhub",
+  })).filter((i) => i.title)
+}
+
+// ─── Shared sentiment pipeline ────────────────────────────────────────────────
+async function applySentiment(
+  items: { title: string; link: string; description: string; pubDate: string; name: string }[],
+  symbols: string[],
+  useFinBERT: boolean,
+) {
+  let finbertUsed = false
+  let sentimentResults: { label: SentimentLabel; score: number }[] = []
+
+  const texts = items.map((i) => `${i.title}. ${i.description}`.slice(0, 300))
+
+  if (useFinBERT) {
+    const batchSize = 10
+    const allResults: { label: SentimentLabel; score: number }[] = []
+    for (let i = 0; i < texts.length; i += batchSize) {
+      const batch = texts.slice(i, i + batchSize)
+      const batchResults = await callFinBERT(batch)
+      allResults.push(...batchResults)
+      if (!finbertUsed && batchResults.some((r) => r.score !== 0)) finbertUsed = true
+    }
+    sentimentResults = allResults
+  } else {
+    sentimentResults = items.map((item) => {
+      const combined = `${item.title} ${item.description}`
+      const score = trSentiment(combined)
+      return { label: toLabel(score), score: Math.round(score * 1000) / 1000 }
+    })
+  }
+
+  const newsItems = items.map((item, idx) => {
+    const combined = `${item.title} ${item.description}`
+    const { label, score } = sentimentResults[idx] ?? { label: "neutral" as SentimentLabel, score: 0 }
+    return {
+      title: item.title,
+      summary: item.description.slice(0, 300) || item.title,
+      url: item.link,
+      source: item.name,
+      published: item.pubDate,
+      sentiment: score,
+      sentiment_label: label,
+      mentioned_stocks: extractStocks(combined, symbols).slice(0, 5),
+      finbert_used: useFinBERT && finbertUsed,
+    }
+  })
+
+  return { newsItems, finbertUsed }
+}
+
 // ─── Main handler ─────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -126,13 +201,66 @@ export async function GET(req: NextRequest) {
   const isEnglish = market === "NASDAQ" || market === "NYSE"
 
   try {
-    const feeds = isEnglish ? EN_RSS_FEEDS : TR_RSS_FEEDS
-    const symbols = isEnglish ? US_SYMBOLS : BIST_SYMBOLS
+    if (isEnglish) {
+      const apiKey = process.env.FINNHUB_API_KEY
+      const symbols = US_SYMBOLS
 
-    const results = await Promise.all(feeds.map(({ name, url }) => parseRSS(name, url)))
+      // Try Finnhub first for English markets
+      if (apiKey && apiKey !== "your_finnhub_api_key_here") {
+        try {
+          const rawItems = await fetchFinnhubNews(apiKey)
+          // Deduplicate
+          const seen = new Set<string>()
+          const unique = rawItems.filter((item) => {
+            const key = item.title.slice(0, 50).toLowerCase()
+            if (seen.has(key)) return false
+            seen.add(key)
+            return true
+          })
+
+          const { newsItems, finbertUsed } = await applySentiment(unique, symbols, true)
+          const avgSentiment = newsItems.length
+            ? newsItems.reduce((s, i) => s + i.sentiment, 0) / newsItems.length
+            : 0
+
+          return NextResponse.json({
+            items: newsItems,
+            market_sentiment: Math.round(avgSentiment * 1000) / 1000,
+            market_sentiment_label: toLabel(avgSentiment),
+            finbert_used: finbertUsed,
+          })
+        } catch {
+          // Fall through to RSS feeds
+        }
+      }
+
+      // RSS fallback for English
+      const results = await Promise.all(EN_RSS_FEEDS.map(({ name, url }) => parseRSS(name, url)))
+      const rawItems = results.flat()
+      const seen = new Set<string>()
+      const unique = rawItems.filter((item) => {
+        const key = item.title.slice(0, 50).toLowerCase()
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      }).slice(0, 30)
+
+      const { newsItems, finbertUsed } = await applySentiment(unique, symbols, true)
+      const avgSentiment = newsItems.length
+        ? newsItems.reduce((s, i) => s + i.sentiment, 0) / newsItems.length
+        : 0
+
+      return NextResponse.json({
+        items: newsItems,
+        market_sentiment: Math.round(avgSentiment * 1000) / 1000,
+        market_sentiment_label: toLabel(avgSentiment),
+        finbert_used: finbertUsed,
+      })
+    }
+
+    // BIST — Turkish RSS feeds + keyword sentiment
+    const results = await Promise.all(TR_RSS_FEEDS.map(({ name, url }) => parseRSS(name, url)))
     const rawItems = results.flat()
-
-    // Deduplicate
     const seen = new Set<string>()
     const unique = rawItems.filter((item) => {
       const key = item.title.slice(0, 50).toLowerCase()
@@ -141,32 +269,11 @@ export async function GET(req: NextRequest) {
       return true
     }).slice(0, 30)
 
-    // Sentiment analysis
-    let finbertUsed = false
-    let sentimentResults: { label: SentimentLabel; score: number }[] = []
-
-    if (isEnglish) {
-      const texts = unique.map((i) => `${i.title}. ${i.description}`.slice(0, 300))
-      // Try FinBERT in batches of 10
-      const batchSize = 10
-      const allResults: { label: SentimentLabel; score: number }[] = []
-      for (let i = 0; i < texts.length; i += batchSize) {
-        const batch = texts.slice(i, i + batchSize)
-        const batchResults = await callFinBERT(batch)
-        allResults.push(...batchResults)
-        // Check if FinBERT actually produced non-neutral results (indicating it worked)
-        if (!finbertUsed && batchResults.some((r) => r.score !== 0)) {
-          finbertUsed = true
-        }
-      }
-      sentimentResults = allResults
-    } else {
-      sentimentResults = unique.map((item) => {
-        const combined = `${item.title} ${item.description}`
-        const score = trSentiment(combined)
-        return { label: toLabel(score), score: Math.round(score * 1000) / 1000 }
-      })
-    }
+    const sentimentResults = unique.map((item) => {
+      const combined = `${item.title} ${item.description}`
+      const score = trSentiment(combined)
+      return { label: toLabel(score), score: Math.round(score * 1000) / 1000 }
+    })
 
     const newsItems = unique.map((item, idx) => {
       const combined = `${item.title} ${item.description}`
@@ -179,8 +286,8 @@ export async function GET(req: NextRequest) {
         published: item.pubDate,
         sentiment: score,
         sentiment_label: label,
-        mentioned_stocks: extractStocks(combined, symbols).slice(0, 5),
-        finbert_used: isEnglish && finbertUsed,
+        mentioned_stocks: extractStocks(combined, BIST_SYMBOLS).slice(0, 5),
+        finbert_used: false,
       }
     })
 
@@ -192,7 +299,7 @@ export async function GET(req: NextRequest) {
       items: newsItems,
       market_sentiment: Math.round(avgSentiment * 1000) / 1000,
       market_sentiment_label: toLabel(avgSentiment),
-      finbert_used: finbertUsed,
+      finbert_used: false,
     })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error"
